@@ -1,0 +1,44 @@
+# PHP2Shell lab — local, authorized testing only.
+#
+#   docker compose up -d --build lab                    # RCE-chain target on :8088
+#   docker compose --profile uaf up -d --build          # + valgrined PHP builds (:8099 stock, :8098 ablated)
+#   docker compose --profile fixed up -d lab-fixed      # same app, upload_progress disabled (:8089)
+#
+# Every port is overridable: LAB_PORT / UAF_STOCK_PORT / UAF_ABLATED_PORT / LAB_FIXED_PORT.
+
+services:
+  lab:
+    build: ./lab
+    image: php2shell-lab:latest
+    container_name: php2shell-lab
+    ports:
+      - "${LAB_PORT:-8088}:80"
+
+  lab-fixed:
+    profiles: ["fixed"]
+    image: php2shell-lab:latest
+    container_name: php2shell-lab-fixed
+    ports:
+      - "${LAB_FIXED_PORT:-8089}:80"
+    volumes:
+      # conf.d files load after php.ini, so this one wins.
+      - ./mitigations/uploads-off.ini:/usr/local/etc/php/conf.d/99-upload-progress-off.ini:ro
+
+  uaf-stock:
+    profiles: ["uaf"]
+    build: ./uaf
+    image: php84-uaf:latest
+    container_name: php84-uaf-stock
+    environment:
+      PHP_BIN: /usr/local/bin/php-stock
+    ports:
+      - "${UAF_STOCK_PORT:-8099}:8099"
+
+  uaf-ablated:
+    profiles: ["uaf"]
+    image: php84-uaf:latest
+    container_name: php84-uaf-ablated
+    environment:
+      PHP_BIN: /usr/local/bin/php-ablated
+    ports:
+      - "${UAF_ABLATED_PORT:-8098}:8099"

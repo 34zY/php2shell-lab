@@ -1,0 +1,19 @@
+# php2shell - FrankenPHP: disable session upload progress in the global
+# frankenphp block. UNOFFICIAL, PROVISIONAL. Real fix: update PHP.
+{
+    frankenphp {
+        php_ini session.upload_progress.enabled 0
+    }
+}
+
+# Optional edge layer: block multipart POSTs except on known upload routes.
+# Put this INSIDE your site block (self-contained, no external file):
+#
+#   @blocked {
+#       method POST PUT PATCH
+#       header Content-Type multipart/form-data*
+#       not path /upload /api/import
+#   }
+#   handle @blocked {
+#       abort
+#   }

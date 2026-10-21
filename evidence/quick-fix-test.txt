@@ -1,0 +1,25 @@
+### PHP2Shell quick-fix.sh — end-to-end test in php2shell-lab container (2026-10-21)
+
+### 1. --check before (expect: ENABLED)
+[*] effective state (this SAPI): ENABLED (vulnerable surface)
+[!] exposed: /usr/local/etc/php/conf.d
+
+### 2. apply
+[+] drop-in: /usr/local/etc/php/conf.d/zz-php2shell-quickfix.ini
+[*] activate: /tmp/qf.sh --restart   (in Docker: docker restart <container>)
+
+### 3. --check after apply (expect: disabled)
+[*] effective state (this SAPI): disabled
+[+] mitigated: /usr/local/etc/php/conf.d
+
+### 4. PoC CVE-2026-109619 after apply + apache reload (expect: no RCE, exit 1)
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.24.0.2. Set the 'ServerName' directive globally to suppress this message
+EXIT=1 (1 = not vulnerable = mitigation WORKS)
+
+### 5. revert
+[+] removed: /usr/local/etc/php/conf.d/zz-php2shell-quickfix.ini
+[*] restart PHP to reload.
+
+### 6. PoC after revert + reload (expect: RCE, exit 0)
+AH00558: apache2: Could not reliably determine the server's fully qualified domain name, using 172.24.0.2. Set the 'ServerName' directive globally to suppress this message
+EXIT=0 (0 = vulnerable again = revert WORKS)
