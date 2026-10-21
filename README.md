@@ -1,4 +1,4 @@
-# PHP2Shell Lab  -  CVE-2026-109618 / CVE-2026-109619 (claimed)
+# PHP2Shell Lab  -  CVE-2026-109618 / CVE-2026-109619
 
 Reproducible, **local-only** lab for the two "PHP2Shell" PHP-core RCE claims:
 one Docker target, two stdlib Python PoCs, a valgrind-instrumented
